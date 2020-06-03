@@ -1,0 +1,18 @@
+name: meta-bandit-selector
+channels:
+- anaconda
+- conda-forge
+dependencies:
+- python=3.6.7
+- pandas=0.25.1
+- scipy=1.3.1
+- numpy=1.17.0
+- scikit-learn=0.21.2
+- requests=2.18.4
+- pip
+- pip:
+  - unidecode==1.1.1
+  - creme==0.5.1
+  - bentoml
+  - pyyaml
+  - responses==0.10.14
