@@ -13,7 +13,7 @@ dependencies:
 - pip:
   - unidecode==1.1.1
   - creme==0.5.1
-  - bentoml
+  - bentoml==0.7.8
   - pyyaml
   - responses==0.10.14
   - prometheus_client
