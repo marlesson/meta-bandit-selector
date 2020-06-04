@@ -36,8 +36,14 @@ class ModelControl(object):
 
   def update(self, context: dict, arm: str, reward: int) -> None:
     if reward and arm in self._arms:
+      # Fit
       self._oracle.fit_one(context, arm)
-    return True
+      
+      # update metric
+      arm_pred = self._oracle.predict_one(context)
+      self._oracle_metric.update(arm, arm_pred)
+      
+    return self._oracle_metric
 
   def predict_proba(self, context: dict) -> dict:
     return self._oracle.predict_proba_one(context)

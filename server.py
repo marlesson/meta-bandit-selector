@@ -3,6 +3,7 @@ from bentoml.handlers import JsonHandler
 from bentoml.artifact import PickleArtifact
 from lib.meta_bandit import MetaBandit
 from policy import e_greedy, softmax
+from lib.monitoring import MetaBanditMonitor
 
 import bentoml
 
@@ -12,6 +13,12 @@ import bentoml
 class MetaBanditClassifier(BentoService):
 
     @property
+    def monitor(self) -> MetaBanditMonitor:
+        if not hasattr(self, "_monitor"):
+            self._monitor = MetaBanditMonitor(self, self.model._config)
+        return self._monitor
+
+    @property
     def model(self) -> MetaBandit:
         if not hasattr(self, "_model"):
             self._model: MetaBandit = self.artifacts.model
@@ -19,9 +26,15 @@ class MetaBanditClassifier(BentoService):
 
     @api(JsonHandler)
     def update(self, input: dict) -> dict:
-        return self.model.update(input)
+        r = self.model.update(input)
+        self.monitor.observe_metric_value(r['metric'], 'update')
+
+        return r
 
     @api(JsonHandler)
     def predict(self, input: dict) -> dict:
-        return self.model.predict(input)
+        r = self.model.predict(input)
+        self.monitor.observe_selected_arm(r['bandit']['arm'])
+
+        return r
 

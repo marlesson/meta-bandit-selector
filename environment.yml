@@ -16,3 +16,4 @@ dependencies:
   - bentoml
   - pyyaml
   - responses==0.10.14
+  - prometheus_client

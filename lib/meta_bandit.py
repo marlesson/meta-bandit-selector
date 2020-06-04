@@ -16,7 +16,11 @@ class MetaBandit(object):
     arm     = input["arm"]
     reward  = int(input["reward"])
 
-    self._policy.update(context, arm, reward)
+    metric = self._policy.update(context, arm, reward)
+
+    return {
+      "metric": metric.get()
+    }
 
   def predict(self, input: dict) -> dict:
 

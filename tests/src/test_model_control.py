@@ -26,7 +26,7 @@ class TestModelControl(unittest.TestCase):
     
     result = model.update(c, a, 1)
 
-    self.assertEqual(result, True)
+    self.assertEqual(result.get(), 1.0)
 
   def test_predict_proba(self):
     model  = ModelControl(self.config)
