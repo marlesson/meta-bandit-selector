@@ -1,6 +1,8 @@
 python -m unittest tests/
 
-python pack.py --config-path config.yml --polity-module policy.e_greedy --polity-cls EGreedyPolicy
+python pack.py --config-path config_egreedy.yml --polity-module policy.e_greedy --polity-cls EGreedyPolicy
+
+python pack.py --config-path config_softmax.yml --polity-module policy.softmax --polity-cls SotfmaxPolicy
 
 bentoml serve MetaBanditClassifier:latest
 bentoml serve RandomRankingRecommender:latest --port 5001

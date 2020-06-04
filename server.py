@@ -2,7 +2,9 @@ from bentoml import env, artifacts, api, BentoService
 from bentoml.handlers import JsonHandler
 from bentoml.artifact import PickleArtifact
 from lib.meta_bandit import MetaBandit
-from policy import e_greedy
+from policy import e_greedy, softmax
+
+import bentoml
 
 @env(auto_pip_dependencies=True)
 @bentoml.ver(1, 0)
@@ -17,9 +19,9 @@ class MetaBanditClassifier(BentoService):
 
     @api(JsonHandler)
     def update(self, input: dict) -> dict:
-        return model.update(input)
+        return self.model.update(input)
 
     @api(JsonHandler)
     def predict(self, input: dict) -> dict:
-        return model.predict(input)
+        return self.model.predict(input)
 

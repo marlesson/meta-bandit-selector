@@ -19,10 +19,11 @@ def get_policy(config: Config, args):
 @responses.activate
 def test_server(config: Config, server: MetaBanditClassifier):
   # mock Request
-  responses.add(responses.POST,  list(config.arms.values())[2],
-      json.dumps({}),
-      headers={'content-type': 'application/json'},
-  )
+  for a in list(config.arms.values()):
+    responses.add(responses.POST, a,
+        json.dumps({}),
+        headers={'content-type': 'application/json'},
+    )
 
   payload = {
     "context": {
