@@ -105,6 +105,16 @@ curl -i \
 }' \
   http://localhost:5000/predict
 ```
+Rquest result:
+
+```json
+{
+  "result": {..}, // Arm Result
+  "bandit": {
+    "arm": "arm1"
+  }
+}
+```
 
 ### Update
 
@@ -121,6 +131,25 @@ http://localhost:5000/update
   "reward": 1
 }
 ```
+
+### Monitoring
+
+#### Oracle Metric
+
+```
+BENTOML_MetaBanditClassifier_oracle_metric_sum
+BENTOML_MetaBanditClassifier_oracle_metric_count
+BENTOML_MetaBanditClassifier_oracle_metric_create
+```
+
+#### Selected Arms
+
+```
+BENTOML_MetaBanditClassifier_arm_total
+```
+
+![MDP](doc/prometheus_exploration.png)
+
 
 ## Examples
 
