@@ -6,7 +6,7 @@ class EGreedyPolicy(ModelControl):
       super().__init__(config, seed)
       self._epsilon = epsilon
   
-    def select_arm(self, context):
+    def select_arm(self, context: dict) -> str:
 
       if self._rng.choice([True, False], p=[self._epsilon, 1.0 - self._epsilon]):
         # Select random endpoint

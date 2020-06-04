@@ -1,12 +1,13 @@
 import requests
 import json
+from config import Config
 
 class ArmControl(object):
   
-  def __init__(self, config):
+  def __init__(self, config: Config):
     self._config = config
 
-  def request(self, arm, payload):
+  def request(self, arm: str, payload: dict) -> dict:
     endpoint = self._config.arms[arm]
 
     r = requests.post(endpoint, 

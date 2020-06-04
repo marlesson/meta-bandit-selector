@@ -27,7 +27,7 @@ class TestPolicyEgreedy(unittest.TestCase):
       model.update(row['x'], row['y'], 1)
 
     predict = model.select_arm({'f1': 1, 'f2': 0})        
-    self.assertEqual(predict, "arm1")
+    self.assertEqual(predict, "arm2")
 
 if __name__ == '__main__':
     unittest.main()

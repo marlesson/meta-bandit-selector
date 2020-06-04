@@ -1,3 +1,5 @@
+python -m unittest tests/
+
 python pack.py --config-path config.yml --polity-module policy.e_greedy --polity-cls EGreedyPolicy
 
 bentoml serve MetaBanditClassifier:latest

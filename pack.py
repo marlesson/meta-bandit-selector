@@ -8,7 +8,7 @@ import importlib
 import json
 from config import Config
 
-def get_policy(config, args):
+def get_policy(config: Config, args):
   polity_module = importlib.import_module(args.polity_module)
   policy_class  = getattr(polity_module, args.polity_cls)
 
@@ -17,7 +17,8 @@ def get_policy(config, args):
   return policy_class(**{**params, **extra_params})
 
 @responses.activate
-def test_server(config, server):
+def test_server(config: Config, server: MetaBanditClassifier):
+  # mock Request
   responses.add(responses.POST,  list(config.arms.values())[2],
       json.dumps({}),
       headers={'content-type': 'application/json'},
@@ -57,18 +58,17 @@ if __name__ == "__main__":
   
   print(args)
 
+  # Build Model
   config       = Config(args.config_path)
   arm_control  = ArmControl(config)
   policy_control = get_policy(config, args)
 
   meta_bandit = MetaBandit(config, policy_control, arm_control)
   
+  # Package Model
   meta_bandit_server = MetaBanditClassifier()
   meta_bandit_server.pack("model", meta_bandit)
-
   meta_bandit_server.save()
 
+  # Test Model
   test_server(config, meta_bandit_server)
-
-  #server_classifier = server()
-

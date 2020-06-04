@@ -7,6 +7,8 @@ import pandas as pd
 from unittest.mock import Mock
 from lib.meta_bandit import *
 from policy.e_greedy import EGreedyPolicy
+from lib.arm_control import ArmControl
+
 from config import Config
 import responses
 import requests
@@ -19,6 +21,8 @@ class TestMetaBandit(unittest.TestCase):
   def setUp(self):
     self.config = Config('tests/src/factories/config/config.yml')
     self.policy = EGreedyPolicy(self.config)
+    self.arm    = ArmControl(self.config)
+
   @property
   def payload(self):
     with open('tests/src/factories/requests/main_payload.json') as json_file:
@@ -42,20 +46,20 @@ class TestMetaBandit(unittest.TestCase):
 
   @responses.activate
   def test_predict(self):
-    responses.add(responses.POST, 'http://arm1.localhost.com',
+    responses.add(responses.POST, 'http://arm2.localhost.com',
         json.dumps(self.payload_result),
         headers={'content-type': 'application/json'},
     )
 
-    meta_bandit = MetaBandit(self.config, self.policy)
+    meta_bandit = MetaBandit(self.config, self.policy, self.arm)
 
     result      = meta_bandit.predict(self.payload)
 
     self.assertEqual(result['result'], self.payload_result)
-    self.assertEqual(result['bandit']['arm'], 'arm1')
+    self.assertEqual(result['bandit']['arm'], 'arm2')
 
   def test_update(self):
-    meta_bandit = MetaBandit(self.config, self.policy)
+    meta_bandit = MetaBandit(self.config, self.policy, self.arm)
 
     result      = meta_bandit.update(self.payload_update)
     print(result)

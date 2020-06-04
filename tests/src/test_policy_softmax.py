@@ -19,7 +19,7 @@ class TestPolicySoftmax(unittest.TestCase):
 
     dataset = [
         {'x': {'f1': 0, 'f2': 1}, 'y': 'arm1'},
-        {'x': {'f1': 1, 'f2': 0}, 'y': 'arm2'},
+        {'x': {'f1': 1, 'f2': 0}, 'y': 'arm2'},        
         {'x': {'f1': 1, 'f2': 1}, 'y': 'arm3'}
       ]
 
@@ -27,7 +27,7 @@ class TestPolicySoftmax(unittest.TestCase):
       model.update(row['x'], row['y'], 1)
 
     predict = model.select_arm({'f1': 1, 'f2': 0})        
-    self.assertEqual(predict, "arm2")
+    self.assertEqual(predict, "arm1")
 
 if __name__ == '__main__':
     unittest.main()
