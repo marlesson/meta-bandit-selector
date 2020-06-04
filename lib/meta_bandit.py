@@ -1,14 +1,13 @@
 
 from lib.model_control import *
-from lib.arm_control import ArmControl
 from config import Config
 
 class MetaBandit(object):
 
-  def __init__(self, config, policy):
+  def __init__(self, config, policy, arms):
     self._config = config
     self._policy = policy
-    self._arm    = ArmControl(config)
+    self._arm    = arms
 
   def update(self, input):
     context = input["context"]
@@ -19,8 +18,8 @@ class MetaBandit(object):
 
   def predict(self, input):
 
-    model_input   = input["input"]
     context_input = input["context"]
+    model_input   = input["input"]
 
     arm    = self._policy.select_arm(context_input)
     result = self._arm.request(arm, model_input)

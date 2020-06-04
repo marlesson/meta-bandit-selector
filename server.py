@@ -1,6 +1,8 @@
 from bentoml import env, artifacts, api, BentoService
 from bentoml.handlers import JsonHandler
 from bentoml.artifact import PickleArtifact
+from lib.meta_bandit import MetaBandit
+from policy import e_greedy
 
 @env(auto_pip_dependencies=True)
 @artifacts([PickleArtifact('model')])

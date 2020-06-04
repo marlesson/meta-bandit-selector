@@ -16,10 +16,12 @@ class ModelControl(object):
     self._oracle  = self.build_oracle()
     self._oracle_metric  = metrics.MacroF1()
     self._times   = 1
+    self._arms_selected = []
+    self._arms = list(self._config.arms.keys())
     self.init_default_reward()
   
   def init_default_reward(self):
-    for a, v in self._config.arms.items():
+    for a in self._arms:
       self.update({}, a, 1)
 
   def build_oracle(self):
@@ -41,6 +43,6 @@ class ModelControl(object):
 
   def select_arm(self, context):
     pred = self.predict_proba(context)
-    arm  = list(pred.keys())[np.argmax(pred.values())]
+    arm  = self._arms[np.argmax(list(pred.values()))]
 
     return arm

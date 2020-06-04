@@ -1,3 +1,7 @@
 arms:
-  arm1: http://arm1.localhost.com
-  arm2: http://arm2.localhost.com
+  random: http://127.0.0.1:5001/rank
+  most_popular: http://127.0.0.1:5002/rank
+  cvae: http://127.0.0.1:5003/rank
+bandit_policy_params:
+  epsilon: 0.1
+  seed: 42

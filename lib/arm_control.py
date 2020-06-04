@@ -16,3 +16,11 @@ class ArmControl(object):
     r = json.loads(r.text)
     
     return r
+
+
+# import requests
+# try: 
+#     url = "http://google.com"
+#     r = requests.get(url, timeout=10)
+# except requests.exceptions.Timeout as e: 
+#     print e    

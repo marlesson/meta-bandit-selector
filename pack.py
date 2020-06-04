@@ -3,18 +3,22 @@ import responses
 
 from server import MetaBanditClassifier 
 from lib.meta_bandit import MetaBandit
+from lib.arm_control import ArmControl
 import importlib
 import json
 from config import Config
 
-def get_policy(args):
+def get_policy(config, args):
   polity_module = importlib.import_module(args.polity_module)
   policy_class  = getattr(polity_module, args.polity_cls)
-  return policy_class(config)
+
+  params = {"config": config}
+  extra_params = config._config['bandit_policy_params']
+  return policy_class(**{**params, **extra_params})
 
 @responses.activate
-def test_server(server):
-  responses.add(responses.POST, 'http://arm1.localhost.com',
+def test_server(config, server):
+  responses.add(responses.POST,  list(config.arms.values())[2],
       json.dumps({}),
       headers={'content-type': 'application/json'},
   )
@@ -41,7 +45,8 @@ def test_server(server):
 
   print(server.predict(payload))
 
-
+# python pack.py --config-path config.yml --polity-module policy.e_greedy --polity-cls EGreedyPolicy
+# bentoml serve MetaBanditClassifier:latest
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process some integers.')
   parser.add_argument('--config-path', help='')
@@ -52,17 +57,18 @@ if __name__ == "__main__":
   
   print(args)
 
-  config = Config(args.config_path)
-  policy = get_policy(args)
+  config       = Config(args.config_path)
+  arm_control  = ArmControl(config)
+  policy_control = get_policy(config, args)
 
-  meta_bandit = MetaBandit(config, policy)
+  meta_bandit = MetaBandit(config, policy_control, arm_control)
   
   meta_bandit_server = MetaBanditClassifier()
   meta_bandit_server.pack("model", meta_bandit)
 
   meta_bandit_server.save()
 
-  test_server(meta_bandit_server)
+  test_server(config, meta_bandit_server)
 
   #server_classifier = server()
 
