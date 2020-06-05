@@ -1,8 +1,12 @@
-# Meta Bandit Selector
+# Contextual Meta-Bandit Selection
+
+The Contextual Meta-Bandit (CMB) can be used to select models using the context with online learning based on Reiforcement Learning problem. It's can be used for recommender system ensemble, A/B test, and other dynamic model selector problem.
 
 ![MDP](doc/meta-bandit.png)
 
-## Dependencies and Requirements
+For each interaction, the environment provides an observation (which contains contextual information). The Meta-Bandit uses it to select one of the recommenders and let the selected one decide the action (recommender item). The environment receives this action and calculates the reward given to the Meta-Bandit.
+
+# Requirements
 - python=3.6.7
 - pandas=0.25.1
 - scipy=1.3.1
@@ -16,16 +20,18 @@
 - responses==0.10.14
 - prometheus_client
 
-### Install
+# Installation
+
+CMB can be installed using conda:
 
 ```bash
-conda env create -f environment.yml
-conda activate meta-bandit-selector
+>>> conda env create -f environment.yml
+>>> conda activate meta-bandit-selector
 ```
 
-## Usage
+# Usage
 
-### Configure Files
+## Configuration
 
 #### config.yml
 
@@ -39,13 +45,20 @@ bandit_policy_params:
   seed: 42
 ```
 
-### Build Package
+## Bandit Polity
+
+We implemented two different policies for the bandit.
+
+* **e-greedy** (policy/e_greedy.py)
+* **Softmax** (policy/softmax.py)
+
+## Deploy Meta-Bandit
 
 ```bash
-python pack.py --h
+>> python package.py --h
 
-usage: pack.py [-h] [--config-path CONFIG_PATH]
-               [--polity-module POLITY_MODULE] [--polity-cls POLITY_CLS]
+usage: package.py [-h] [--config-path CONFIG_PATH]
+                  [--polity-module POLITY_MODULE] [--polity-cls POLITY_CLS]
 
 Process some integers.
 
@@ -57,18 +70,28 @@ optional arguments:
 
 ```
 
-Package meta-bandit with e-greedy:
+Example of Package meta-bandit with e-greedy:
 
 ```bash
-python pack.py --config-path config_egreedy.yml \
---polity-module policy.e_greedy --polity-cls EGreedyPolicy
+>> python package.py \
+      --config-path config/config_egreedy.yml \
+      --polity-module policy.e_greedy \
+      --polity-cls EGreedyPolicy
 ```
 
-### Predict
+### Start server
 
-http://localhost:5000/predict
+```bash
+>> bentoml serve MetaBanditClassifier:latest
+```
 
-#### Format 
+## Endpoints
+
+### POST /predict
+
+In the prediction it is necessary to send the context information that will be used by the meta-bandit and the arm's input.
+
+#### Payload Format
 ```json
 {
   "context": {
@@ -79,6 +102,8 @@ http://localhost:5000/predict
   }
 }
 ```
+
+
 #### Example
 ```bash
 curl -i \
@@ -105,7 +130,7 @@ curl -i \
 }' \
   http://localhost:5000/predict
 ```
-Rquest result:
+Request result:
 
 ```json
 {
@@ -116,12 +141,11 @@ Rquest result:
 }
 ```
 
-### Update
+### POST /update
 
-#### Format 
+The /update method should be used to update the meta-bandit oracle for online learning. The result of the past action, containing the context and the reward, must be sent to the meta-bandit.
 
-http://localhost:5000/update
-
+#### Payload Format
 ```json
 {
   "context": {
@@ -132,7 +156,9 @@ http://localhost:5000/update
 }
 ```
 
-### Monitoring
+### GET /metrics
+
+we use prometheus.io to monitor the meta-bandit. It is possible to monitor the performance metrics of the oracle and the execution of each arm.
 
 #### Oracle Metric
 
@@ -148,6 +174,8 @@ BENTOML_MetaBanditClassifier_oracle_metric_create
 BENTOML_MetaBanditClassifier_arm_total
 ```
 
+Example of arm exploration in a recommendation system:
+
 ![MDP](doc/prometheus_exploration.png)
 
 
@@ -159,10 +187,10 @@ BENTOML_MetaBanditClassifier_arm_total
 ## Test
 
 ```bash
-python -m unittest tests/src/test_*
+>> python -m unittest tests/src/test_*
 ```
 
-## Cite
+## Cite us
 Please cite the associated paper for this work if you use this code:
 
 

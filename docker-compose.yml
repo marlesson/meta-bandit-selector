@@ -5,7 +5,7 @@ services:
     user: root
     restart: unless-stopped
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/data
     ports:
       - 9090:9090
