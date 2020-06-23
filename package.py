@@ -60,11 +60,11 @@ if __name__ == "__main__":
   print(args)
 
   # Build Model
-  config       = Config(args.config_path)
-  arm_control  = ArmControl(config)
-  policy_control = get_policy(config, args)
+  config          = Config(args.config_path)
+  arm_control     = ArmControl(config)
+  policy_control  = get_policy(config, args)
 
-  meta_bandit = MetaBandit(config, policy_control, arm_control)
+  meta_bandit     = MetaBandit(config, policy_control, arm_control)
   
   # Package Model
   meta_bandit_server = MetaBanditClassifier()

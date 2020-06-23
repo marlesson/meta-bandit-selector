@@ -15,10 +15,10 @@ class ModelControl(object):
     self._config  = config
     self._rng     = RandomState(seed)
     self._oracle  = self.build_oracle()
-    self._oracle_metric  = metrics.MacroF1()
+    self._oracle_metric = metrics.MacroF1()
     self._times   = 1
     self._arms_selected = []
-    self._arms = list(self._config.arms.keys())
+    self._arms    = list(self._config.arms.keys())
     self.init_default_reward()
   
   def init_default_reward(self):

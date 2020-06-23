@@ -191,13 +191,17 @@ Example of arm exploration in a recommendation system:
 ```
 
 ## Cite us
-Please cite the associated paper for this work if you use this code:
-
-
+Please cite the associated paper for this work if you use this code [Paper]:
 ```
 @article{smc2020metabandit,
   title={Contextual Meta-Bandit for Recommender Systems Selection},
-  author={Santana, Melo, and Camargo, et al.},
+  author={Marlesson R. O. de Santana and
+          Luckeciano C. Melo and
+          Fernando H. F. Camargo and
+          Bruno Brandão and
+          Renan Oliveira and
+          Sandor Caetano and
+          Anderson Soares},
   journal={},
   year={2020}
 }
