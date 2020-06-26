@@ -16,21 +16,21 @@ from bentoml.handlers import DataframeHandler
 class MostPopularRecommender(bentoml.BentoService):
 
     def get_index(self, item):
-        if str(item) in self.artifacts.index_map:
-            return self.artifacts.index_map[str(item)]
+        if item in self.artifacts.index_map:
+            return self.artifacts.index_map[item]
         else:
             return 0
 
 
     def get_score(self, index):
-        return self.artifacts.item_score[str(index)]
+        return self.artifacts.item_score[index]
 
     @bentoml.api(DataframeHandler)
     def rank(self, sample):
         articles = sample['Article_List']
         indexed_articles = [self.get_index(art) for art in articles]
         scores = [self.get_score(art) for art in indexed_articles]
-        output = [item for item, score in sorted(zip(articles, scores),reverse=True)]
+        output = [item for score, item in sorted(zip(scores, articles),reverse=True)]
         return output
 
 
