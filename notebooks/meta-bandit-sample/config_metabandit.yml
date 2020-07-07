@@ -1,0 +1,8 @@
+arms:
+  random: http://127.0.0.1:5000/rank
+  most_popular: http://127.0.0.1:5001/rank
+  cluster_knn: http://127.0.0.1:5002/rank
+  cluster_matrix_factorization: http://127.0.0.1:5003/rank
+bandit_policy_params:
+  epsilon: 0.1
+  seed: 42

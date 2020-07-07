@@ -12,6 +12,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import svds
+import requests
 
 from .preprocessing import preprocess, read_sample
 from .knn_cluster import ClusteredKNN
@@ -295,6 +296,7 @@ class TrainRandomRecommender(luigi.Task):
         model.save()
         model.save_to_dir(self.output().path)
 
+#PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline Evaluation --local-scheduler --split-test 0.2 --sample-train 1 --n-clusters 100 --n-factors 10
 class Evaluation(luigi.Task):
     split_test: float = luigi.FloatParameter(default=0.1)
     sample_train: float = luigi.FloatParameter(default=0.1)
@@ -357,40 +359,101 @@ class Evaluation(luigi.Task):
         print(df_result)
         df_result.to_csv(self.output().path)
 
+import json
+
+# PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline EvaluationInteraction \
+# --local-scheduler --split-test 0.2 --sample-train 0.1 --endpoint http://localhost:5000/rank
+
+# python package.py \
+#       --config-path notebooks/meta-bandit-sample/config_metabandit.yml \
+#       --polity-module policy.e_greedy \
+#       --polity-cls EGreedyPolicy
+
+# PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline EvaluationInteraction \
+# --local-scheduler --split-test 0.2 --sample-train 0.1 --endpoint http://localhost:5005/predict \
+# --update-endpoint http://localhost:5005/update
+
 class EvaluationInteraction(luigi.Task):
     split_test: float = luigi.FloatParameter(default=0.1)
     sample_train: float = luigi.FloatParameter(default=0.1)
     #n_clusters: int = luigi.IntParameter(default=10)
     #n_factors: int = luigi.IntParameter(default=5)
-    #endpoint = 
+    endpoint: str = luigi.Parameter(default="")
+    update_endpoint: str = luigi.Parameter(default="")
+    obs: str = luigi.Parameter(default="")
+
+    with_context: bool = luigi.BoolParameter(default=False)
 
     def requires(self):
         return PrepareDataset(split_test=self.split_test, sample_train=self.sample_train)
     
     def output(self):
         return luigi.LocalTarget(
-            os.path.join(DATASET_DIR, "metrics_%2f_%2f_%d_%d.csv" % (self.split_test, self.sample_train, self.n_clusters, self.n_factors)))
+            os.path.join(DATASET_DIR, "interaction_%2f_%2f_%s.csv" % (self.split_test, self.sample_train, self.obs)))
+
+    def request(self, endpoint, payload):
+        r = requests.post(endpoint, data = json.dumps(payload), headers={"Content-Type": "application/json"} )
+        return json.loads(r.text)
+
+    def update(self, endpoint, context, arm, reward):
+        payload = {
+            "context": context,
+            "arm": arm,
+            "reward": reward
+        }
+
+        r = requests.post(endpoint, data = json.dumps(payload), headers={"Content-Type": "application/json"} )
+        return json.loads(r.text)        
+
+    def get_reward(self, article, article_list):
+        reward      = int(article_list[0] == article)
+        idx_clicked = article_list.index(article)
+        return reward, idx_clicked
 
     def run(self):
         # Read Test
-        df = pd.read_csv(self.input()[0][1].path)
+        df = pd.read_csv(self.input()[1].path)
         df['User_Features'] = df['User_Features'].apply(ast.literal_eval)
-        df['Article_List'] = df['Article_List'].apply(ast.literal_eval)
+        df['Article_List']  = df['Article_List'].apply(ast.literal_eval)
         
         print(df.head())
         results = []
 
         for i, row in df.iterrows():
             
-            model_payload = {'User_Features': row.User_Features, 'Article_List': row.Article_List}
-            payload = {
-                "context": row.User_Features,
-                "input": model_payload
-            }
+            payload = {'User_Features': row.User_Features, 'Article_List': row.Article_List}
+            context =  dict(zip(["f{}".format(i) for i in range(len(row.User_Features))], row.User_Features))
+            #print(context)
+            if self.with_context:
+                payload = {
+                    "context": context,
+                    "input": payload
+                }                
 
+            # Request
+            output = self.request(self.endpoint, payload)
+            arm    = ""
+            if self.with_context:
+                arm    = output['bandit']['arm']
+                output = output['result']
+
+
+            reward, idx_clicked = self.get_reward(row.Clicked_Article, output['articles'])
+            
+
+            if self.with_context and reward:
+                self.update(self.update_endpoint, context, arm, reward)
+
+            results.append([i, arm, idx_clicked, reward])
 
             if i % 1000 == 0:
-                pass
+                print("Evaluation...", i/len(df))
+                print(pd.DataFrame(results).mean())
+                print("")
+
+        df = pd.DataFrame(results)
+        df.columns = ['idx', 'arm', 'idx_clicked', 'reward']
+
+        df.to_csv(self.output().path)
         
 
-#PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline Evaluation --local-scheduler --split-test 0.2 --sample-train 1 --n-clusters 100 --n-factors 10
