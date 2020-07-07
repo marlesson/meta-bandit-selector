@@ -5,6 +5,7 @@ import numpy as np
 from bentoml.artifact import PickleArtifact
 # from bentoml.adapters import DataframeInput
 from bentoml.handlers import DataframeHandler
+from bentoml.handlers import JsonHandler
 
 @bentoml.ver(1, 0)
 @bentoml.artifacts([
@@ -37,12 +38,17 @@ class ClusteredKNN(bentoml.BentoService):
         else:
             return self.mean_scores[index]
 
-    @bentoml.api(DataframeHandler)
-    def rank(self, sample, n_neighbors):
+    @bentoml.api(JsonHandler)
+    def rank(self, sample):
+        n_neighbors = 50
         articles = sample['Article_List']
         indexed_articles = [self.get_index(art) for art in articles]
         user_features = sample['User_Features']
         self.setup_scores(np.asarray([user_features]), n_neighbors)
         scores = [self.get_score(idx) for idx in indexed_articles]
         output = [item for score, item in sorted(zip(scores, articles),reverse=True)]
-        return output
+
+        return {
+            "articles": output,
+            "scores": sorted(scores, reverse=True)
+        }

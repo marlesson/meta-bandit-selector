@@ -6,6 +6,9 @@ import datetime
 from os import listdir
 from os.path import isfile, join
 
+import random
+
+
 def preprocess(path, timetrack=False):
     # the path can be both a file or a folder containing multiple files
     # Should it be a folder, be sure that the folder contains ONLY the dataset files unzipped
@@ -83,4 +86,15 @@ def preprocess(path, timetrack=False):
         file.close()
 
     df = pd.DataFrame(data)
+    return df
+
+
+def read_sample(filename, p=0.01):
+    # keep the header, then take only 1% of lines
+    # if random from [0,1] interval is greater than 0.01 the row will be skipped
+    df = pd.read_csv(
+        filename,
+        skiprows=lambda i: i > 0 and random.random() > p
+    )
+
     return df

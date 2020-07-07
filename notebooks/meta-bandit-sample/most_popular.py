@@ -4,7 +4,7 @@ import numpy as np
 
 from bentoml.artifact import PickleArtifact
 # from bentoml.adapters import DataframeInput
-from bentoml.handlers import DataframeHandler
+from bentoml.handlers import JsonHandler
 
 @bentoml.ver(1, 0)
 @bentoml.artifacts([
@@ -25,13 +25,17 @@ class MostPopularRecommender(bentoml.BentoService):
     def get_score(self, index):
         return self.artifacts.item_score[index]
 
-    @bentoml.api(DataframeHandler)
+    @bentoml.api(JsonHandler)
     def rank(self, sample):
         articles = sample['Article_List']
         indexed_articles = [self.get_index(art) for art in articles]
         scores = [self.get_score(art) for art in indexed_articles]
         output = [item for score, item in sorted(zip(scores, articles),reverse=True)]
-        return output
+        
+        return {
+            "articles": output,
+            "scores": sorted(scores, reverse=True)
+        }
 
 
 # def pack_indexmap(bento: MostPopularRecommender, indexmap: dict):

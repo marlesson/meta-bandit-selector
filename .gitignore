@@ -2,6 +2,7 @@
 output/
 mlruns/
 metastore_db/
+dataset/
 # Spyder project settings
 .spyderproject
 .spyproject
