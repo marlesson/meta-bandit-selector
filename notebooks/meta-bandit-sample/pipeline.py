@@ -330,10 +330,11 @@ class Evaluation(luigi.Task):
             print(input)
 
             model = bentoml.load(input.path)
-            
+            model_name = type(model).__name__
+
             for i, row in df.iterrows():
                 payload = {'User_Features': row.User_Features, 'Article_List': row.Article_List}
-                output = model.rank(payload)
+                output  = model.rank(payload)
 
                 idx_clicked = output['articles'].index(row.Clicked_Article)
 
@@ -343,10 +344,17 @@ class Evaluation(luigi.Task):
                 result['ndcg@5'].append(ndcg_at_k(r, 5))
                 result['precision@1'].append(precision_at_k(r, 1))
 
+                if i % 1000 == 0:
+                    print("[model_name] Evaluation...", i/len(df))
+                    print(result.mean())
+                    print("")
+            
             df_result = pd.DataFrame(result)#.mean()
-            df_result['model'] = type(model).__name__
+            df_result['model'] = model_name
             results.append(df_result)
         
         df_result = pd.concat(results).groupby('model').mean()
         print(df_result)
         df_result.to_csv(self.output().path)
+
+#PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline Evaluation --local-scheduler --split-test 0.2 --sample-train 1 --n-clusters 100 --n-factors 10
