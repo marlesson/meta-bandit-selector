@@ -146,7 +146,7 @@ class TrainClusteredMatrixFactRecommender(luigi.Task):
         users  = np.asarray(df.loc[:, 'User_Features'])  # acquire only the features
         # stack them to make an array (iteractions, features)
         users  = np.stack(users, axis=0)
-        kmeans = KMeans(n_clusters=10, n_jobs=-1)
+        kmeans = KMeans(n_clusters=n_clusters, n_jobs=-1)
         kmeans.fit(users)
         
         return kmeans
@@ -356,5 +356,41 @@ class Evaluation(luigi.Task):
         df_result = pd.concat(results).groupby('model').mean()
         print(df_result)
         df_result.to_csv(self.output().path)
+
+class EvaluationInteraction(luigi.Task):
+    split_test: float = luigi.FloatParameter(default=0.1)
+    sample_train: float = luigi.FloatParameter(default=0.1)
+    #n_clusters: int = luigi.IntParameter(default=10)
+    #n_factors: int = luigi.IntParameter(default=5)
+    endpoint = 
+
+    def requires(self):
+        return PrepareDataset(split_test=self.split_test, sample_train=self.sample_train)
+    
+    def output(self):
+        return luigi.LocalTarget(
+            os.path.join(DATASET_DIR, "metrics_%2f_%2f_%d_%d.csv" % (self.split_test, self.sample_train, self.n_clusters, self.n_factors)))
+
+    def run(self):
+        # Read Test
+        df = pd.read_csv(self.input()[0][1].path)
+        df['User_Features'] = df['User_Features'].apply(ast.literal_eval)
+        df['Article_List'] = df['Article_List'].apply(ast.literal_eval)
+        
+        print(df.head())
+        results = []
+
+        for i, row in df.iterrows():
+            
+            model_payload = {'User_Features': row.User_Features, 'Article_List': row.Article_List}
+            payload = {
+                "context": row.User_Features,
+                "input": model_payload
+            }
+
+
+            if i % 1000 == 0:
+                pass
+        
 
 #PYTHONPATH="." luigi --module notebooks.meta-bandit-sample.pipeline Evaluation --local-scheduler --split-test 0.2 --sample-train 1 --n-clusters 100 --n-factors 10
