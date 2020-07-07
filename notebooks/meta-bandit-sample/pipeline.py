@@ -226,7 +226,7 @@ class TrainClusteredKNNRecommender(luigi.Task):
         users = np.asarray(df.loc[:, 'User_Features'])
         # stack them to make an array (iteractions, features)
         users = np.stack(users, axis=0)
-        kmeans = KMeans(n_clusters=10, n_jobs=-1)
+        kmeans = KMeans(n_clusters=n_clusters, n_jobs=-1)
         kmeans.fit(users)
 
         return kmeans

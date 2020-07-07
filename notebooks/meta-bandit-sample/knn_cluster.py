@@ -40,7 +40,7 @@ class ClusteredKNN(bentoml.BentoService):
 
     @bentoml.api(JsonHandler)
     def rank(self, sample):
-        n_neighbors = 50
+        n_neighbors = 10
         articles = sample['Article_List']
         indexed_articles = [self.get_index(art) for art in articles]
         user_features = sample['User_Features']
