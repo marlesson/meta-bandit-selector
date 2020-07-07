@@ -346,7 +346,7 @@ class Evaluation(luigi.Task):
 
                 if i % 1000 == 0:
                     print("[model_name] Evaluation...", i/len(df))
-                    print(result.mean())
+                    print(pd.DataFrame(result).mean())
                     print("")
             
             df_result = pd.DataFrame(result)#.mean()
