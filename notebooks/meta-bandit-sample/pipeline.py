@@ -362,7 +362,7 @@ class EvaluationInteraction(luigi.Task):
     sample_train: float = luigi.FloatParameter(default=0.1)
     #n_clusters: int = luigi.IntParameter(default=10)
     #n_factors: int = luigi.IntParameter(default=5)
-    endpoint = 
+    #endpoint = 
 
     def requires(self):
         return PrepareDataset(split_test=self.split_test, sample_train=self.sample_train)
