@@ -203,8 +203,8 @@ Please cite the associated paper for this work if you use this code [Paper]:
   year={2020}
 }
 
-Paper: https://dl.acm.org/doi/10.1145/3383313.3412209
 ```
+https://dl.acm.org/doi/10.1145/3383313.3412209
 
 ## License
 
