@@ -2,6 +2,8 @@
 
 The Contextual Meta-Bandit (CMB) can be used to select models using the context with online learning based on Reiforcement Learning problem. It's can be used for recommender system ensemble, A/B test, and other dynamic model selector problem.
 
+https://vimeo.com/456553645
+
 ![MDP](doc/meta-bandit.png)
 
 For each interaction, the environment provides an observation (which contains contextual information). The Meta-Bandit uses it to select one of the recommenders and let the selected one decide the action (recommender item). The environment receives this action and calculates the reward given to the Meta-Bandit.
@@ -193,18 +195,15 @@ Example of arm exploration in a recommendation system:
 ## Cite us
 Please cite the associated paper for this work if you use this code [Paper]:
 ```
-@article{smc2020metabandit,
+@inproceedings{santana2020contextual,
   title={Contextual Meta-Bandit for Recommender Systems Selection},
-  author={Marlesson R. O. de Santana and
-          Luckeciano C. Melo and
-          Fernando H. F. Camargo and
-          Bruno Brandão and
-          Renan Oliveira and
-          Sandor Caetano and
-          Anderson Soares},
-  journal={},
+  author={Santana, Marlesson RO and Melo, Luckeciano C and Camargo, Fernando HF and Brand{\~a}o, Bruno and Soares, Anderson and Oliveira, Renan M and Caetano, Sandor},
+  booktitle={Fourteenth ACM Conference on Recommender Systems},
+  pages={444--449},
   year={2020}
 }
+
+Paper: https://dl.acm.org/doi/10.1145/3383313.3412209
 ```
 
 ## License
